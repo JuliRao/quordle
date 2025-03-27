@@ -5,6 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quordle for Swifties!</title>
     <style>
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #121213;
+            color: #ffffff;
+        }
+        .dark-mode .cell {
+            background-color: #3a3a3c;
+            color: #ffffff;
+            border-color: #565758;
+        }
+        .dark-mode .cell.filled {
+            border-color: #818384;
+        }
+        .dark-mode .key {
+            background-color: #818384;
+            color: #ffffff;
+        }
+        .dark-mode .instructions {
+            color: #a1a1a1;
+        }
+        
+        /* Dark mode toggle button */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #ff6b6b;
+        }
+        .dark-mode .dark-mode-toggle {
+            color: #ffffff;
+        }
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f8ff;
@@ -140,6 +175,34 @@
     </style>
 </head>
 <body>
+    <!-- Add this button right after the opening <body> tag -->
+    <button class="dark-mode-toggle" id="darkModeToggle">🌓</button>
+    
+    <!-- Rest of your existing HTML remains exactly the same -->
+    
+    <script>
+        // Add this dark mode toggle functionality
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        // Check for saved user preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+        }
+        
+        // Toggle dark mode
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Save user preference
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+    </script>
+
     <h1>Quordle for Swifties!</h1>
     <div class="instructions">In Quordle Wordle game, you have to guess 4 words in 10 tries. After each guess, the color of the letters will change to give you clues about the hidden word.</div>
     <div class="instructions">The colors indicate if letters are correct: green for right place, yellow for wrong place, and gray for not in the word.</div>

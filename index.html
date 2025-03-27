@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quordle for Swifties!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        .instructions {
+            color: #666;
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .board {
+            display: grid;
+            grid-template-rows: repeat(8, 60px);
+            grid-gap: 5px;
+            margin: 0 10px;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            grid-gap: 5px;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #d3d6da;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: white;
+        }
+        .cell.filled {
+            border-color: #878a8c;
+        }
+        .cell.correct {
+            background-color: #6aaa64;
+            color: white;
+            border-color: #6aaa64;
+        }
+        .cell.present {
+            background-color: #c9b458;
+            color: white;
+            border-color: #c9b458;
+        }
+        .cell.absent {
+            background-color: #787c7e;
+            color: white;
+            border-color: #787c7e;
+        }
+        .keyboard {
+            margin-top: 30px;
+        }
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        .key {
+            min-width: 40px;
+            height: 58px;
+            margin: 0 3px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #d3d6da;
+            cursor: pointer;
+            user-select: none;
+        }
+        .key.wide {
+            min-width: 65px;
+            font-size: 12px;
+        }
+        .key.correct {
+            background-color: #6aaa64;
+            color: white;
+        }
+        .key.present {
+            background-color: #c9b458;
+            color: white;
+        }
+        .key.absent {
+            background-color: #787c7e;
+            color: white;
+        }
+        #message {
+            height: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 20px 0;
+        }
+        .hidden {
+            display: none;
+        }
+        .birthday-message {
+            font-size: 24px;
+            color: #ff6b6b;
+            margin-top: 30px;
+            animation: fadeIn 2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Quordle for Swifties!</h1>
+    <div class="instructions">In Quordle Wordle game, you have to guess 4 words in 9 tries. After each guess, the color of the letters will change to give you clues about the hidden word.</div>
+    <div class="instructions">The colors indicate if letters are correct: green for right place, yellow for wrong place, and gray for not in the word.</div>
+    <div id="birthdayMessage" class="hidden birthday-message">
+        Wow you are a real Swiftie! 💚💛💜❤️🩵🖤🩷🩶🤎💙🤍
+    </div>
+    
+    <div class="game-container">
+        <div class="board" id="board1"></div>
+        <div class="board" id="board2"></div>
+        <div class="board" id="board3"></div>
+        <div class="board" id="board4"></div>
+    </div>
+    
+    <div class="keyboard">
+        <div class="keyboard-row">
+            <div class="key" data-key="Q">Q</div>
+            <div class="key" data-key="W">W</div>
+            <div class="key" data-key="E">E</div>
+            <div class="key" data-key="R">R</div>
+            <div class="key" data-key="T">T</div>
+            <div class="key" data-key="Y">Y</div>
+            <div class="key" data-key="U">U</div>
+            <div class="key" data-key="I">I</div>
+            <div class="key" data-key="O">O</div>
+            <div class="key" data-key="P">P</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="key" data-key="A">A</div>
+            <div class="key" data-key="S">S</div>
+            <div class="key" data-key="D">D</div>
+            <div class="key" data-key="F">F</div>
+            <div class="key" data-key="G">G</div>
+            <div class="key" data-key="H">H</div>
+            <div class="key" data-key="J">J</div>
+            <div class="key" data-key="K">K</div>
+            <div class="key" data-key="L">L</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="key wide" data-key="Enter">Enter</div>
+            <div class="key" data-key="Z">Z</div>
+            <div class="key" data-key="X">X</div>
+            <div class="key" data-key="C">C</div>
+            <div class="key" data-key="V">V</div>
+            <div class="key" data-key="B">B</div>
+            <div class="key" data-key="N">N</div>
+            <div class="key" data-key="M">M</div>
+            <div class="key wide" data-key="Backspace">⌫</div>
+        </div>
+    </div>
+
+    <script>
+        // Game configuration
+        const answers = [
+            'seven', 'lover', 'exile', 'betty', 'swift', 'cruel', 'style', 'karma',
+            'clean', 'paris', 'peace', 'dress', 'spark', 'story', 'sound', 'snake',
+            'shake'
+        ];
+        const shuffled = [...answers].sort(() => 0.5 - Math.random());
+        targets = shuffled.slice(0, 4);
+        const maxAttempts = 9;
+        const wordLength = 5;
+        
+        // Game state
+        let currentBoards = [0, 1, 2, 3]; // Track which boards are active
+        let currentAttempts = [0, 0, 0, 0]; // Attempts per board
+        let currentRows = [0, 0, 0, 0]; // Current row per board
+        let boardStates = [[], [], [], []]; // Store guesses for each board
+        let completedBoards = [false, false, false, false];
+        
+        // Initialize boards
+        function initializeBoards() {
+            for (let boardIdx = 0; boardIdx < 4; boardIdx++) {
+                const board = document.getElementById(`board${boardIdx + 1}`);
+                board.innerHTML = '';
+                
+                for (let row = 0; row < maxAttempts; row++) {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'row';
+                    
+                    for (let col = 0; col < wordLength; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.id = `board${boardIdx + 1}-row${row}-col${col}`;
+                        rowDiv.appendChild(cell);
+                    }
+                    
+                    board.appendChild(rowDiv);
+                }
+            }
+        }
+        
+        // Handle keyboard input
+        function handleKeyPress(key) {
+            if (key === 'Enter') {
+                submitGuess();
+            } else if (key === 'Backspace') {
+                deleteLastLetter();
+            } else if (/^[A-Z]$/.test(key)) {
+                addLetter(key);
+            }
+        }
+        
+        // Add a letter to the current cells
+        function addLetter(letter) {
+            for (const boardIdx of currentBoards) {
+                if (completedBoards[boardIdx]) continue;
+                
+                const currentRow = currentRows[boardIdx];
+                const currentGuess = boardStates[boardIdx][currentRow] || '';
+                
+                if (currentGuess.length < wordLength) {
+                    boardStates[boardIdx][currentRow] = currentGuess + letter.toLowerCase();
+                    updateBoardCells();
+                }
+            }
+        }
+        
+        // Delete the last letter
+        function deleteLastLetter() {
+            for (const boardIdx of currentBoards) {
+                if (completedBoards[boardIdx]) continue;
+                
+                const currentRow = currentRows[boardIdx];
+                const currentGuess = boardStates[boardIdx][currentRow] || '';
+                
+                if (currentGuess.length > 0) {
+                    boardStates[boardIdx][currentRow] = currentGuess.slice(0, -1);
+                    updateBoardCells();
+                }
+            }
+        }
+        
+        // Submit the current guess
+        function submitGuess() {
+            let allValid = true;
+            
+            // Validate guesses for active boards
+            for (const boardIdx of currentBoards) {
+                if (completedBoards[boardIdx]) continue;
+                
+                const currentRow = currentRows[boardIdx];
+                const currentGuess = boardStates[boardIdx][currentRow] || '';
+                
+                if (currentGuess.length !== wordLength) {
+                    allValid = false;
+                    document.getElementById('message').textContent = `Guess must be ${wordLength} letters`;
+                    setTimeout(() => {
+                        document.getElementById('message').textContent = '';
+                    }, 2000);
+                    return;
+                }
+            }
+            
+            if (allValid) {
+                // Process each active board
+                for (const boardIdx of currentBoards) {
+                    if (completedBoards[boardIdx]) continue;
+                    
+                    const currentRow = currentRows[boardIdx];
+                    const currentGuess = boardStates[boardIdx][currentRow];
+                    const targetWord = targets[boardIdx];
+                    
+                    // Create arrays to track which letters we've already matched
+                    const targetLetters = targetWord.split('');
+                    const guessLetters = currentGuess.split('');
+                    const result = new Array(wordLength).fill('absent');
+                    
+                    // First pass: mark correct letters
+                    for (let i = 0; i < wordLength; i++) {
+                        if (guessLetters[i] === targetLetters[i]) {
+                            result[i] = 'correct';
+                            targetLetters[i] = null; // Mark as used
+                            guessLetters[i] = null;  // Mark as used
+                        }
+                    }
+                    
+                    // Second pass: mark present letters (correct letter but wrong position)
+                    for (let i = 0; i < wordLength; i++) {
+                        if (guessLetters[i] === null) continue; // Skip already matched letters
+                        
+                        const foundIndex = targetLetters.indexOf(guessLetters[i]);
+                        if (foundIndex !== -1) {
+                            result[i] = 'present';
+                            targetLetters[foundIndex] = null; // Mark as used
+                        }
+                    }
+                    
+                    // Update cells based on the result
+                    for (let i = 0; i < wordLength; i++) {
+                        const cell = document.getElementById(`board${boardIdx + 1}-row${currentRow}-col${i}`);
+                        cell.classList.add(result[i]);
+                        cell.classList.add('filled');
+                        
+                        // Update keyboard colors (don't override correct with present/absent)
+                        if (result[i] === 'correct') {
+                            updateKeyboardKey(currentGuess[i], 'correct');
+                        } else if (result[i] === 'present' && 
+                                 !document.querySelector(`.key[data-key="${currentGuess[i].toUpperCase()}"].correct`)) {
+                            updateKeyboardKey(currentGuess[i], 'present');
+                        } else if (result[i] === 'absent' && 
+                                   !document.querySelector(`.key[data-key="${currentGuess[i].toUpperCase()}"].correct`) && 
+                                   !document.querySelector(`.key[data-key="${currentGuess[i].toUpperCase()}"].present`)) {
+                            updateKeyboardKey(currentGuess[i], 'absent');
+                        }
+                    }
+                    
+                    // Check if board is completed
+                    if (currentGuess === targetWord) {
+                        completedBoards[boardIdx] = true;
+                        currentBoards = currentBoards.filter(b => b !== boardIdx);
+                    }
+                    
+                    currentRows[boardIdx]++;
+                    currentAttempts[boardIdx]++;
+                }
+                
+                // Check if all boards are completed
+                if (completedBoards.every(b => b)) {
+                    setTimeout(() => {
+                        document.getElementById('birthdayMessage').classList.remove('hidden');
+                    }, 1500);
+                }
+            }
+        }
+        
+        // Update all board cells based on current guesses
+        function updateBoardCells() {
+            for (let boardIdx = 0; boardIdx < 4; boardIdx++) {
+                if (completedBoards[boardIdx]) continue;
+                
+                const currentRow = currentRows[boardIdx];
+                const currentGuess = boardStates[boardIdx][currentRow] || '';
+                
+                // Update cells for current row
+                for (let i = 0; i < wordLength; i++) {
+                    const cell = document.getElementById(`board${boardIdx + 1}-row${currentRow}-col${i}`);
+                    cell.textContent = i < currentGuess.length ? currentGuess[i].toUpperCase() : '';
+                    cell.classList.toggle('filled', i < currentGuess.length);
+                }
+            }
+        }
+        
+        // Update keyboard key colors
+        function updateKeyboardKey(letter, state) {
+            const keys = document.querySelectorAll(`.key[data-key="${letter.toUpperCase()}"]`);
+            keys.forEach(key => {
+                // Don't override correct with present or absent
+                if (!key.classList.contains('correct')) {
+                    key.classList.remove('present', 'absent');
+                    key.classList.add(state);
+                }
+            });
+        }
+        
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleKeyPress('Enter');
+            } else if (e.key === 'Backspace') {
+                handleKeyPress('Backspace');
+            } else if (/^[a-zA-Z]$/.test(e.key)) {
+                handleKeyPress(e.key.toUpperCase());
+            }
+        });
+        
+        document.querySelectorAll('.key').forEach(key => {
+            key.addEventListener('click', () => {
+                handleKeyPress(key.getAttribute('data-key'));
+            });
+        });
+        
+        // Initialize the game
+        initializeBoards();
+    </script>
+</body>
+</html>

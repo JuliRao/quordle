@@ -114,18 +114,24 @@
             color: white;
             border-color: #787c7e;
         }
+        /* Keyboard Styles */
         .keyboard {
-            margin-top: 30px;
+            margin: 10px auto;
+            padding: 0 5px;
+            max-width: 500px; /* Limits keyboard width on larger screens */
         }
+
         .keyboard-row {
             display: flex;
             justify-content: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
+
         .key {
-            min-width: 40px;
-            height: 58px;
-            margin: 0 3px;
+            height: 50px;
+            min-width: 30px; /* Fixed minimum for laptops */
+            max-width: 40px; /* Fixed maximum for laptops */
+            margin: 0 2px;
             border-radius: 4px;
             display: flex;
             justify-content: center;
@@ -134,11 +140,28 @@
             font-weight: bold;
             background-color: #d3d6da;
             cursor: pointer;
-            user-select: none;
+            flex-grow: 1; /* Allows growing on mobile */
         }
+
         .key.wide {
-            min-width: 65px;
-            font-size: 12px;
+            min-width: 50px; /* Fixed for laptops */
+            max-width: 60px; /* Fixed for laptops */
+            font-size: 14px;
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 600px) {
+            .key {
+                min-width: 8vw; /* Flexible on small screens */
+                max-width: none; /* Remove fixed max on mobile */
+                height: 45px;
+                font-size: clamp(12px, 3.5vw, 16px);
+            }
+            .key.wide {
+                min-width: 12vw;
+                max-width: none;
+                font-size: clamp(10px, 3vw, 14px);
+            }
         }
         .key.correct {
             background-color: #6aaa64;

@@ -16,10 +16,20 @@
             color: #ff6b6b;
             margin-bottom: 10px;
         }
+        .answer-reveal {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        .answer-word {
+            color: #6aaa64;
+            text-transform: uppercase;
+        }
         .instructions {
             color: #666;
-            font-size: 20px;
-            margin-bottom: 15px;
+            font-size: 18px;
+            margin-bottom: 10px;
             font-style: italic;
         }
         .game-container {
@@ -31,23 +41,22 @@
         }
         .board {
             display: grid;
-            grid-template-rows: repeat(8, 60px);
+            grid-template-rows: repeat(9, 50px);
             grid-gap: 5px;
-            margin: 0 10px;
         }
         .row {
             display: grid;
-            grid-template-columns: repeat(5, 60px);
+            grid-template-columns: repeat(5, 50px);
             grid-gap: 5px;
         }
         .cell {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border: 2px solid #d3d6da;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 32px;
+            font-size: 26px;
             font-weight: bold;
             text-transform: uppercase;
             background-color: white;
@@ -132,8 +141,16 @@
 </head>
 <body>
     <h1>Quordle for Swifties!</h1>
-    <div class="instructions">In Quordle Wordle game, you have to guess 4 words in 9 tries. After each guess, the color of the letters will change to give you clues about the hidden word.</div>
+    <div class="instructions">In Quordle Wordle game, you have to guess 4 words in 10 tries. After each guess, the color of the letters will change to give you clues about the hidden word.</div>
     <div class="instructions">The colors indicate if letters are correct: green for right place, yellow for wrong place, and gray for not in the word.</div>
+    <div id="answerReveal" class="hidden answer-reveal">
+        The correct answers were: 
+        <span class="answer-word" id="answer1"></span>, 
+        <span class="answer-word" id="answer2"></span>, 
+        <span class="answer-word" id="answer3"></span>, 
+        <span class="answer-word" id="answer4"></span>
+        Better luck next time!
+    </div>
     <div id="birthdayMessage" class="hidden birthday-message">
         Wow you are a real Swiftie! 💚💛💜❤️🩵🖤🩷🩶🤎💙🤍
     </div>
@@ -187,11 +204,11 @@
         const answers = [
             'seven', 'lover', 'exile', 'betty', 'swift', 'cruel', 'style', 'karma',
             'clean', 'paris', 'peace', 'dress', 'spark', 'story', 'sound', 'snake',
-            'shake'
+            'shake', 'tears'
         ];
         const shuffled = [...answers].sort(() => 0.5 - Math.random());
         targets = shuffled.slice(0, 4);
-        const maxAttempts = 9;
+        const maxAttempts = 10;
         const wordLength = 5;
         
         // Game state
@@ -346,14 +363,34 @@
                     
                     currentRows[boardIdx]++;
                     currentAttempts[boardIdx]++;
+                    
+                    // Check if attempts exhausted
+                    if (currentAttempts[boardIdx] >= maxAttempts && !completedBoards[boardIdx]) {
+                        completedBoards[boardIdx] = true; // Mark as completed (failed)
+                        currentBoards = currentBoards.filter(b => b !== boardIdx);
+                    }
                 }
                 
                 // Check if all boards are completed
                 if (completedBoards.every(b => b)) {
                     setTimeout(() => {
-                        document.getElementById('birthdayMessage').classList.remove('hidden');
+                        // Show answers if not all solved
+                        if (!boardStates.every((board, idx) => board[currentRows[idx]-1] === targets[idx])) {
+                            revealAnswers();
+                        }
+                        else {
+                            document.getElementById('birthdayMessage').classList.remove('hidden');
+                        }
                     }, 1500);
                 }
+            }
+        }
+
+        // Add this new function to reveal answers
+        function revealAnswers() {
+            document.getElementById('answerReveal').classList.remove('hidden');
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`answer${i+1}`).textContent = targets[i];
             }
         }
         
